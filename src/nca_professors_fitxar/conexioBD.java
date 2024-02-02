@@ -3,6 +3,8 @@ package nca_professors_fitxar;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class conexioBD {
     private String url;
@@ -17,10 +19,6 @@ public class conexioBD {
         this.contrasenya = "";
         //this.drive = "com.mysql.cj.jdbc.Driver";
     }
-
-    public Connection getConexio() {
-        return conexio;
-    }
     
     public void obrirConexio() throws SQLException, ClassNotFoundException{
         //Class.forName(drive);
@@ -33,4 +31,15 @@ public class conexioBD {
         }
     }
     
+    //select
+    public ResultSet ecjecutarConsulta(String consulta) throws SQLException{
+        Statement statement = conexio.createStatement();
+        return statement.executeQuery(consulta);
+    }
+    
+    //insertar, actualitzar y eliminar
+    public int ecjecutarActualitzar(String consulta) throws SQLException{
+        Statement statement = conexio.createStatement();
+        return statement.executeUpdate(consulta);
+    }
 }

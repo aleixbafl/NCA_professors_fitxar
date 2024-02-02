@@ -1,13 +1,15 @@
 package nca_professors_fitxar;
 
-import java.awt.Dimension;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import java.sql.ResultSet;
 
 public class inici extends javax.swing.JFrame {
+    private boolean segonaPantalla = false;
     public inici() {
         initComponents();
     }
@@ -49,7 +51,7 @@ public class inici extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(131, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(130, 130, 130))
+                .addContainerGap(130, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,7 +81,7 @@ public class inici extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(iniciar, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+                    .addComponent(iniciar, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                     .addComponent(dni))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -90,7 +92,7 @@ public class inici extends javax.swing.JFrame {
                 .addComponent(dni, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(iniciar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -98,11 +100,11 @@ public class inici extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
+                .addContainerGap(19, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,16 +121,16 @@ public class inici extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(29, 29, 29))
+                .addGap(18, 18, 18))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(32, 32, 32)
+                .addGap(22, 22, 22)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(32, 32, 32))
+                .addGap(22, 22, 22))
         );
 
         pack();
@@ -137,15 +139,25 @@ public class inici extends javax.swing.JFrame {
     private void iniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarActionPerformed
         conexioBD conexio = new conexioBD();
         try {
-            conexio.obrirConexio();
-            System.out.println("correcte");
-            /*principal pantallaPrincipal = new principal();
-            Dimension minSize = new Dimension(500, 600);
-            pantallaPrincipal.setMinimumSize(minSize);
-            pantallaPrincipal.setTitle("Pantalla d'Inici");
-            pantallaPrincipal.setVisible(true);*/
+            if (dni.getText().equals("")) {
+                missatge("Has d'inserir un DNI.");
+            } else {
+                conexio.obrirConexio();
+                ResultSet resultat = conexio.ecjecutarConsulta("SELECT dni FROM professor WHERE dni LIKE \"" + dni.getText() + "\"; ");
+                if (resultat.next()){ //48256486W
+                    String dniString = resultat.getString("dni");
+                    if (finestraSiNo("Vols guardar les credencials?")) {
+                        guardarUsuari(resultat.getString(WIDTH));
+                        segonaPantalla = true;
+                    } else {
+                        segonaPantalla = true;
+                    }
+                } else {
+                    missatge("L'usuari no existeix.");
+                }
+            }
         } catch (SQLException ex) {
-            missatgeError("A agut un error a la connexió a la Base de Dades.");
+            missatge("A agut un error a la connexió a la Base de Dades.");
             System.out.println(ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
@@ -204,11 +216,36 @@ public class inici extends javax.swing.JFrame {
         
     }
 
-    void setIconImage(ImageIcon icono) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private void missatge(String missatge) {
+        JOptionPane.showMessageDialog(rootPane, missatge);
     }
 
-    private void missatgeError(String missatge) {
-        JOptionPane.showMessageDialog(rootPane, missatge);
+    private boolean finestraSiNo(String missatge) {
+        int opcio = JOptionPane.showConfirmDialog(null, missatge, "Confirmación", JOptionPane.YES_NO_OPTION);
+        if (opcio == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void guardarUsuari(String string) {
+        try {
+            FileWriter fw = new FileWriter("usuari.txt");
+            fw.write(string);
+            fw.close();
+        } catch (IOException e){
+            missatge("A agut un error en guardar les credencials de l'usuari.");
+        }
+    }
+
+    public boolean metodeSegonaPantalla() {
+        return segonaPantalla;
+        /*principal pantallaPrincipal = new principal();
+        Dimension minSize = new Dimension(500, 600);
+        pantallaPrincipal.setMinimumSize(minSize);
+        pantallaPrincipal.setTitle("Pantalla d'Inici");
+        pantallaPrincipal.setVisible(true);*/
+        
     }
 }
