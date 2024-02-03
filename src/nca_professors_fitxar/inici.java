@@ -1,5 +1,12 @@
 package nca_professors_fitxar;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import static java.awt.image.ImageObserver.WIDTH;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -7,11 +14,49 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import javax.swing.ImageIcon;
 
 public class inici extends javax.swing.JFrame {
-    private boolean segonaPantalla = false;
+    File usuariLogin = new File("usuari.txt");
     public inici() {
         initComponents();
+        if (usuariLogin.exists()) {
+            lleguirUsuari(usuariLogin.getPath());
+        }
+        
+        iniciar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                conexioBD conexio = new conexioBD();
+                try {
+                    if (dni.getText().equals("")) {
+                        missatge("Has d'inserir un DNI.");
+                    } else {
+                        conexio.obrirConexio();
+                        ResultSet resultat = conexio.ecjecutarConsulta("SELECT dni FROM professor WHERE dni LIKE \"" + dni.getText() + "\"; ");
+                        if (resultat.next()){ //48256486W
+                            if (!usuariLogin.exists()) {
+                                String dniString = resultat.getString("dni");
+                                if (finestraSiNo("Vols guardar les credencials?")) {
+                                    guardarUsuari(resultat.getString(WIDTH));
+                                    metodeSegonaPantalla();
+                                    dispose();
+                                }
+                            } else {
+                                metodeSegonaPantalla();
+                                dispose();
+                            }
+                        } else {
+                            missatge("El DNI introduït és erroni o no existeix.");
+                        }
+                    }
+                } catch (SQLException ex) {
+                    missatge("A agut un error a la connexió a la Base de Dades.");
+                    System.out.println(ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     /**
@@ -110,7 +155,7 @@ public class inici extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(16, 16, 16))
@@ -137,31 +182,7 @@ public class inici extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void iniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarActionPerformed
-        conexioBD conexio = new conexioBD();
-        try {
-            if (dni.getText().equals("")) {
-                missatge("Has d'inserir un DNI.");
-            } else {
-                conexio.obrirConexio();
-                ResultSet resultat = conexio.ecjecutarConsulta("SELECT dni FROM professor WHERE dni LIKE \"" + dni.getText() + "\"; ");
-                if (resultat.next()){ //48256486W
-                    String dniString = resultat.getString("dni");
-                    if (finestraSiNo("Vols guardar les credencials?")) {
-                        guardarUsuari(resultat.getString(WIDTH));
-                        segonaPantalla = true;
-                    } else {
-                        segonaPantalla = true;
-                    }
-                } else {
-                    missatge("L'usuari no existeix.");
-                }
-            }
-        } catch (SQLException ex) {
-            missatge("A agut un error a la connexió a la Base de Dades.");
-            System.out.println(ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
 
     }//GEN-LAST:event_iniciarActionPerformed
 
@@ -213,7 +234,6 @@ public class inici extends javax.swing.JFrame {
                 new inici().setVisible(true);
             }
         });
-        
     }
 
     private void missatge(String missatge) {
@@ -238,14 +258,31 @@ public class inici extends javax.swing.JFrame {
             missatge("A agut un error en guardar les credencials de l'usuari.");
         }
     }
+    
+    private void lleguirUsuari(String string) {
+        if (finestraSiNo("Vols recuperar les credencials d'inici de sessió?")) {
+            try {
+                FileReader fr = new FileReader(usuariLogin);
+                BufferedReader bf = new BufferedReader(fr);
+                dni.setText(bf.readLine());
+                bf.close();
+                fr.close();
+            } catch (IOException e){
+                missatge("A agut un error en llegir les credencials guardades.");
+            }
+        } else {
+            usuariLogin.delete();
+        }
+    }
 
-    public boolean metodeSegonaPantalla() {
-        return segonaPantalla;
-        /*principal pantallaPrincipal = new principal();
+    public void metodeSegonaPantalla() {
+        ImageIcon icon = new ImageIcon("hora.png");
+        principal pantallaPrincipal = new principal();
         Dimension minSize = new Dimension(500, 600);
         pantallaPrincipal.setMinimumSize(minSize);
-        pantallaPrincipal.setTitle("Pantalla d'Inici");
-        pantallaPrincipal.setVisible(true);*/
+        pantallaPrincipal.setTitle("Pantalla d'Inici - Fitxar");
+        pantallaPrincipal.setIconImage(icon.getImage());
+        pantallaPrincipal.setVisible(true);
         
     }
 }

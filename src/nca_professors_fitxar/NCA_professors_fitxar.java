@@ -14,19 +14,8 @@ public class NCA_professors_fitxar {
         inici pantallaInici = new inici();
         Dimension minSize = new Dimension(500, 600);
         pantallaInici.setMinimumSize(minSize);
-        pantallaInici.setTitle("Pantalla d'Inici");
+        pantallaInici.setTitle("Pantalla d'Inici - Fitxar");
         pantallaInici.setIconImage(icon.getImage());
         pantallaInici.setVisible(true);
-        do {
-            System.out.println(pantallaInici.metodeSegonaPantalla());
-            if (pantallaInici.metodeSegonaPantalla()) {
-                pantallaInici.dispose();
-                principal principalPantalla = new principal();
-                principalPantalla.setMinimumSize(minSize);
-                principalPantalla.setTitle("Pantalla principal");
-                principalPantalla.setIconImage(icon.getImage());
-                principalPantalla.setVisible(true);
-            }
-        } while (!pantallaInici.metodeSegonaPantalla());
     }
 }
