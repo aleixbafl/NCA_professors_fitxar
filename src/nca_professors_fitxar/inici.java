@@ -34,17 +34,9 @@ public class inici extends javax.swing.JFrame {
                         conexio.obrirConexio();
                         ResultSet resultat = conexio.ecjecutarConsulta("SELECT dni FROM professor WHERE dni LIKE \"" + dni.getText() + "\"; ");
                         if (resultat.next()){ //48256486W
-                            if (!usuariLogin.exists()) {
-                                String dniString = resultat.getString("dni");
-                                if (finestraSiNo("Vols guardar les credencials?")) {
-                                    guardarUsuari(resultat.getString(WIDTH));
-                                    metodeSegonaPantalla();
-                                    dispose();
-                                }
-                            } else {
-                                metodeSegonaPantalla();
-                                dispose();
-                            }
+                            guardarUsuari(resultat.getString(WIDTH));
+                            metodeSegonaPantalla();
+                            dispose();
                         } else {
                             missatge("El DNI introduït és erroni o no existeix.");
                         }

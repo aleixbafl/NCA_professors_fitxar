@@ -7,18 +7,26 @@ package nca_professors_fitxar;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author aleix
  */
 public class principal extends javax.swing.JFrame {
+    File usuariLogin = new File("usuari.txt");
     
-    /**
-     * Creates new form principal
-     */
     public principal() {
         initComponents();
         
@@ -194,7 +202,38 @@ public class principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fitxarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fitxarActionPerformed
-        // TODO add your handling code here:
+        try {
+            FileReader fr = new FileReader(usuariLogin);    //<-|
+            BufferedReader bf = new BufferedReader(fr);     //<-|
+            String dni = bf.readLine();                     //<-|--> Lleguir del fitxer usuari.txt per a poder obtenir les credencials del professor
+            bf.close();                                     //<-|
+            fr.close();                                     //<-|
+            
+            LocalDateTime dataHora = LocalDateTime.now();//Obtenir l'hora y data del sistema
+            
+            //Donar el format de data per un cantor y el format de data i hora per un altre canto
+            DateTimeFormatter dataFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter dataHoraFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            
+            conexioBD conexio = new conexioBD();//Crear objecte conexioBD
+            if (!fixarInici(conexio)) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
+                try {
+                    conexio.obrirConexio();
+
+                    conexio.ecjecutarActualitzar("INSERT INTO `dia`(`data`, `dni`, `horaDataEntrada`) VALUES ('" + dataFormat.format(dataHora) + "','" + dni + "','" + dataHoraFormat.format(dataHora) + "');");
+
+                    conexio.tancaConexio();
+                } catch (SQLException ex){
+                    missatge("A agut un error a la connexió a la Base de Dades.");
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
+                
+            }
+        } catch (IOException e){
+            missatge("A agut un error en llegir les credencials guardades.");
+        }
     }//GEN-LAST:event_fitxarActionPerformed
 
     private void fitxar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fitxar1ActionPerformed
@@ -237,12 +276,8 @@ public class principal extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new principal().setVisible(true);
-            }
-        });
+        principal pantalla = new principal();
+        pantalla.sessio();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -255,4 +290,22 @@ public class principal extends javax.swing.JFrame {
     private javax.swing.JButton tanca;
     private javax.swing.JButton tancaSessio;
     // End of variables declaration//GEN-END:variables
+
+    private void sessio() {
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new principal().setVisible(true);
+            }
+        });
+    }
+
+    private void missatge(String missatge) {
+        JOptionPane.showMessageDialog(rootPane, missatge);
+    }
+
+    private boolean fixarInici(conexioBD conexio) {
+        
+        return false;
+    }
 }
