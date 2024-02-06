@@ -35,6 +35,7 @@ public class inici extends javax.swing.JFrame {
                         ResultSet resultat = conexio.ecjecutarConsulta("SELECT dni FROM professor WHERE dni LIKE \"" + dni.getText() + "\"; ");
                         if (resultat.next()){ //48256486W
                             guardarUsuari(resultat.getString(WIDTH));
+                            conexio.tancaConexio();
                             metodeSegonaPantalla();
                             dispose();
                         } else {

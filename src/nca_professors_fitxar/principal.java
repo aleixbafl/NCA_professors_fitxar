@@ -103,7 +103,6 @@ public class principal extends javax.swing.JFrame {
 
         fitxar.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         fitxar.setText("Fitxar");
-        fitxar.setActionCommand("Fitxar");
         fitxar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fitxarActionPerformed(evt);
@@ -310,14 +309,24 @@ public class principal extends javax.swing.JFrame {
 
     private int fixarInici(conexioBD conexio, String dniString, String data) {
         try{
+            conexio.obrirConexio();
             ResultSet resultat = conexio.ecjecutarConsulta("SELECT `data`, `dni` FROM `dia` WHERE data LIKE '" + data + "' AND dni LIKE '" + dniString + "'; ");
             if (resultat.next()) {
+                conexio.tancaConexio();
                 return 1;
             } else{
+                conexio.tancaConexio();
                 return 2;
             }
         } catch(SQLException ex){
             missatge("A agut un error en llegir les credencials guardades.");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            conexio.tancaConexio();
+        } catch (SQLException ex) {
+            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
         }
         return 0;
     }
