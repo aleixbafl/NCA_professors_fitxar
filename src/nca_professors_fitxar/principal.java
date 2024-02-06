@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -216,7 +217,8 @@ public class principal extends javax.swing.JFrame {
             DateTimeFormatter dataHoraFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             
             conexioBD conexio = new conexioBD();//Crear objecte conexioBD
-            if (!fixarInici(conexio)) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
+            int aFitxat = fixarInici(conexio, dni, dataFormat.format(dataHora));
+            if (aFitxat == 2) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
                 try {
                     conexio.obrirConexio();
 
@@ -228,8 +230,10 @@ public class principal extends javax.swing.JFrame {
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
+            } else if (aFitxat == 1) {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
                 
+            } else {
+                missatge("A agut un error a la connexió a la Base de Dades.");
             }
         } catch (IOException e){
             missatge("A agut un error en llegir les credencials guardades.");
@@ -304,8 +308,17 @@ public class principal extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(rootPane, missatge);
     }
 
-    private boolean fixarInici(conexioBD conexio) {
-        
-        return false;
+    private int fixarInici(conexioBD conexio, String dniString, String data) {
+        try{
+            ResultSet resultat = conexio.ecjecutarConsulta("SELECT `data`, `dni` FROM `dia` WHERE data LIKE '" + data + "' AND dni LIKE '" + dniString + "'; ");
+            if (resultat.next()) {
+                return 1;
+            } else{
+                return 2;
+            }
+        } catch(SQLException ex){
+            missatge("A agut un error en llegir les credencials guardades.");
+        }
+        return 0;
     }
 }
