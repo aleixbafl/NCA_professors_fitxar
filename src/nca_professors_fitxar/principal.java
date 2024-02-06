@@ -31,6 +31,19 @@ public class principal extends javax.swing.JFrame {
     public principal() {
         initComponents();
         
+        hores.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                ImageIcon icon = new ImageIcon("hora.png");
+                hores horesPantalla = new hores();
+                Dimension minSize = new Dimension(600, 700);
+                horesPantalla.setMinimumSize(minSize);
+                horesPantalla.setTitle("Hores - Fitxar");
+                horesPantalla.setIconImage(icon.getImage());
+                horesPantalla.setVisible(true);
+                dispose();
+            }
+        });
+        
         tancaSessio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 File f = new File("usuari.txt");
@@ -70,7 +83,7 @@ public class principal extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         fitxar = new javax.swing.JButton();
         tanca = new javax.swing.JButton();
-        fitxar1 = new javax.swing.JButton();
+        hores = new javax.swing.JButton();
         tancaSessio = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -117,11 +130,11 @@ public class principal extends javax.swing.JFrame {
             }
         });
 
-        fitxar1.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
-        fitxar1.setText("Hores");
-        fitxar1.addActionListener(new java.awt.event.ActionListener() {
+        hores.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        hores.setText("Hores");
+        hores.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fitxar1ActionPerformed(evt);
+                horesActionPerformed(evt);
             }
         });
 
@@ -141,7 +154,7 @@ public class principal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(tancaSessio, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                    .addComponent(fitxar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(hores, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(fitxar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tanca, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -152,7 +165,7 @@ public class principal extends javax.swing.JFrame {
                 .addGap(35, 35, 35)
                 .addComponent(fitxar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
-                .addComponent(fitxar1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(hores, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
                 .addComponent(tancaSessio, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
@@ -239,9 +252,9 @@ public class principal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_fitxarActionPerformed
 
-    private void fitxar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fitxar1ActionPerformed
+    private void horesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_horesActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_fitxar1ActionPerformed
+    }//GEN-LAST:event_horesActionPerformed
 
     private void tancaSessioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tancaSessioActionPerformed
         // TODO add your handling code here:
@@ -285,7 +298,7 @@ public class principal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton fitxar;
-    private javax.swing.JButton fitxar1;
+    private javax.swing.JButton hores;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

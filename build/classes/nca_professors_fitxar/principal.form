@@ -125,7 +125,7 @@
                       <EmptySpace max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
                           <Component id="tancaSessio" alignment="0" pref="120" max="32767" attributes="0"/>
-                          <Component id="fitxar1" alignment="0" max="32767" attributes="0"/>
+                          <Component id="hores" alignment="0" max="32767" attributes="0"/>
                           <Component id="fitxar" alignment="0" max="32767" attributes="0"/>
                           <Component id="tanca" alignment="0" max="32767" attributes="0"/>
                       </Group>
@@ -139,7 +139,7 @@
                       <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="fitxar" min="-2" pref="40" max="-2" attributes="0"/>
                       <EmptySpace pref="80" max="32767" attributes="0"/>
-                      <Component id="fitxar1" min="-2" pref="40" max="-2" attributes="0"/>
+                      <Component id="hores" min="-2" pref="40" max="-2" attributes="0"/>
                       <EmptySpace pref="81" max="32767" attributes="0"/>
                       <Component id="tancaSessio" min="-2" pref="40" max="-2" attributes="0"/>
                       <EmptySpace pref="80" max="32767" attributes="0"/>
@@ -172,7 +172,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tancaActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="fitxar1">
+            <Component class="javax.swing.JButton" name="hores">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Times New Roman" size="14" style="0"/>
@@ -180,7 +180,7 @@
                 <Property name="text" type="java.lang.String" value="Hores"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fitxar1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="horesActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="tancaSessio">
