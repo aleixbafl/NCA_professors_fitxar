@@ -4,6 +4,11 @@
  */
 package nca_professors_fitxar;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author aleix
@@ -15,6 +20,19 @@ public class hores extends javax.swing.JFrame {
      */
     public hores() {
         initComponents();
+        
+        pantallaInici.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                ImageIcon icon = new ImageIcon("hora.png");
+                principal pantallaPrincipal = new principal();
+                Dimension minSize = new Dimension(600, 700);
+                pantallaPrincipal.setMinimumSize(minSize);
+                pantallaPrincipal.setTitle("Hores - Fitxar");
+                pantallaPrincipal.setIconImage(icon.getImage());
+                pantallaPrincipal.setVisible(true);
+                dispose();
+            }
+        });
     }
 
     /**

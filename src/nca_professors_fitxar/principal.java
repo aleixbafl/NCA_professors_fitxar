@@ -251,7 +251,7 @@ public class principal extends javax.swing.JFrame {
             DateTimeFormatter dataHoraFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             
             conexioBD conexio = new conexioBD();//Crear objecte conexioBD
-            int aFitxat = fixarInici(conexio, dni, dataFormat.format(dataHora));
+            int aFitxat = fixarInici(conexio, dni, dataFormat.format(dataHora));//fixarInici retorne 0 (error SQL), 1 (el professor a fitxat el inici) i 2 (no a fitxat aquell dia)
             if (aFitxat == 2) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
                 try {
                     conexio.obrirConexio();
@@ -367,7 +367,7 @@ public class principal extends javax.swing.JFrame {
     }
 
     private int guardarArxiuProjecte(File arxiu, String extencio) {
-        Path rutaProjecte = Paths.get("hora." + extencio);
+        Path rutaProjecte = Paths.get("horari." + extencio);
         try {
             Files.copy(arxiu.toPath(), rutaProjecte, StandardCopyOption.REPLACE_EXISTING);
             return 0;
@@ -381,6 +381,7 @@ public class principal extends javax.swing.JFrame {
         File horai1 = new File("horari.xlsx");
         File horai2 = new File("horari.ods");
         if (horai1.exists()) {
+            System.out.println("Entre");
             return true;
         } else if (horai2.exists()) {
             return true;
