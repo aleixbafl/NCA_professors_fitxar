@@ -11,14 +11,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -30,6 +34,13 @@ public class principal extends javax.swing.JFrame {
     
     public principal() {
         initComponents();
+        
+        /*
+        Comprovar si hi ha un arxiu al projecte amb el nom horari i amb l'extensió xlsx o ods.
+        En cas de no existir li demanarà a l'usuari que li digui on el té guardat (l'arxiu ha 
+        de ser horari.xlsx/ods) i copiar i enganxarà a l'arrel del projecte.
+        */
+        horari();
         
         hores.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -57,7 +68,18 @@ public class principal extends javax.swing.JFrame {
                 pantallaInici.setTitle("Pantalla d'Inici - Fitxar");
                 pantallaInici.setIconImage(icon.getImage());
                 pantallaInici.setVisible(true);
+                eliminarHorari();
                 dispose();
+            }
+
+            private void eliminarHorari() {
+                File horai1 = new File("horari.xlsx");
+                File horai2 = new File("horari.ods");
+                if (horai1.exists()) {
+                    horai1.delete();
+                } else {
+                    horai2.delete();
+                }
             }
         });
         
@@ -342,5 +364,67 @@ public class principal extends javax.swing.JFrame {
             Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
         }
         return 0;
+    }
+
+    private int guardarArxiuProjecte(File arxiu, String extencio) {
+        Path rutaProjecte = Paths.get("hora." + extencio);
+        try {
+            Files.copy(arxiu.toPath(), rutaProjecte, StandardCopyOption.REPLACE_EXISTING);
+            return 0;
+        } catch (Exception e){
+            System.out.println("A agut un error en guardar l'arxiu.");
+        }
+        return 1;
+    }
+
+    private boolean horariExist() {
+        File horai1 = new File("horari.xlsx");
+        File horai2 = new File("horari.ods");
+        if (horai1.exists()) {
+            return true;
+        } else if (horai2.exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void horari() {
+        if (!horariExist()) {
+            JFileChooser fileChooser = new JFileChooser();
+            int seleccion = 1;
+            File arxiu = new File("");
+            do{
+                seleccion = fileChooser.showOpenDialog(principal.this);
+                if (seleccion == 0) {
+                    arxiu = fileChooser.getSelectedFile();
+                    //System.out.println(arxiu.getName());
+                    String arxiuSplit[] = arxiu.getName().split("\\.");
+                    System.out.println(arxiuSplit.length);
+                    if (arxiuSplit.length != 2) {
+                        missatge("L'arxiu sol pot tenir 1 \".\", Ex.: nom.extensió");
+                        seleccion = 1;
+                    }else {
+                        if (!arxiuSplit[0].equals("horari")) {
+                            missatge("El nom de l'arxiu ha de ser \"horari\".");
+                        } else {
+                            switch (arxiuSplit[arxiuSplit.length - 1]){
+                                case "xlsx":
+                                    seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
+                                    break;
+                                case "ods":
+                                    seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
+                                    break;
+                                default:
+                                    missatge("L'arxiu ha de tenir l'extensió xlsx o ods.");
+                                    seleccion = 1;
+                            }
+                        }
+                    }
+                } else {
+                    missatge("S'ha de seleccionar un arxiu.");
+                }
+            } while(seleccion != 0);
+        }
     }
 }
