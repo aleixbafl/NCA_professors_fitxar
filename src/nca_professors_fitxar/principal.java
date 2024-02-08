@@ -17,8 +17,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -265,6 +268,17 @@ public class principal extends javax.swing.JFrame {
                     Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if (aFitxat == 1) {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
+                try{
+                    conexio.obrirConexio();
+                    ResultSet horaDataEntrada = conexio.ecjecutarConsulta("SELECT horaDataEntrada FROM dia WHERE dni LIKE \"" + dni + "\" AND data LIKE '" + dataFormat.format(dataHora) + "';");
+                    conexio.tancaConexio();
+                    int horesRealitzades = contarHores(horaDataEntrada, dataHoraFormat.format(dataHora));
+                    
+                } catch(SQLException ex){
+                    
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
             } else {
                 missatge("A agut un error a la connexió a la Base de Dades.");
@@ -413,11 +427,8 @@ public class principal extends javax.swing.JFrame {
                                 case "xlsx":
                                     seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
                                     break;
-                                case "ods":
-                                    seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
-                                    break;
                                 default:
-                                    missatge("L'arxiu ha de tenir l'extensió xlsx o ods.");
+                                    missatge("L'arxiu ha de tenir l'extensió xlsx.");
                                     seleccion = 1;
                             }
                         }
@@ -427,5 +438,20 @@ public class principal extends javax.swing.JFrame {
                 }
             } while(seleccion != 0);
         }
+    }
+
+    private int contarHores(ResultSet horaDataEntrada, String dataFi) {
+        String formatData = "yyyy-MM-dd  HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(formatData);
+        try {
+            horaDataEntrada.next();
+            Date dataFiHora = sdf.parse(dataFi);
+            Date dataIniciHora = sdf.parse(horaDataEntrada.getString(WIDTH));
+        } catch (ParseException e){
+            
+        } catch (SQLException ex) {
+            
+        }
+        return 0;
     }
 }
