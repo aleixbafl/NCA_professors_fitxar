@@ -2,6 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+
 package nca_professors_fitxar;
 
 import java.awt.Dimension;
@@ -9,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +47,7 @@ public class principal extends javax.swing.JFrame {
         En cas de no existir li demanarà a l'usuari que li digui on el té guardat (l'arxiu ha 
         de ser horari.xlsx/ods) i copiar i enganxarà a l'arrel del projecte.
         */
+        
         horari();
         
         hores.addActionListener(new ActionListener(){
@@ -253,35 +258,39 @@ public class principal extends javax.swing.JFrame {
             DateTimeFormatter dataFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             DateTimeFormatter dataHoraFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             
-            conexioBD conexio = new conexioBD();//Crear objecte conexioBD
-            int aFitxat = fixarInici(conexio, dni, dataFormat.format(dataHora));//fixarInici retorne 0 (error SQL), 1 (el professor a fitxat el inici) i 2 (no a fitxat aquell dia)
-            if (aFitxat == 2) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
-                try {
-                    conexio.obrirConexio();
+            if (capDeSetmana(dataFormat.format(dataHora))) {
+                missatge("No es fitxa als caps de setmana.");
+            } else{
+                conexioBD conexio = new conexioBD();//Crear objecte conexioBD
+                int aFitxat = fixarInici(conexio, dni, dataFormat.format(dataHora));//fixarInici retorne 0 (error SQL), 1 (el professor a fitxat el inici) i 2 (no a fitxat aquell dia)
+                if (aFitxat == 2) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
+                    try {
+                        conexio.obrirConexio();
 
-                    conexio.ecjecutarActualitzar("INSERT INTO `dia`(`data`, `dni`, `horaDataEntrada`) VALUES ('" + dataFormat.format(dataHora) + "','" + dni + "','" + dataHoraFormat.format(dataHora) + "');");
+                        conexio.ecjecutarActualitzar("INSERT INTO `dia`(`data`, `dni`, `horaDataEntrada`) VALUES ('" + dataFormat.format(dataHora) + "','" + dni + "','" + dataHoraFormat.format(dataHora) + "');");
 
-                    conexio.tancaConexio();
-                } catch (SQLException ex){
+                        conexio.tancaConexio();
+                    } catch (SQLException ex){
+                        missatge("A agut un error a la connexió a la Base de Dades.");
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else if (aFitxat == 1) {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
+                    try{
+                        conexio.obrirConexio();
+                        ResultSet horaDataEntrada = conexio.ecjecutarConsulta("SELECT horaDataEntrada FROM dia WHERE dni LIKE \"" + dni + "\" AND data LIKE '" + dataFormat.format(dataHora) + "';");
+                        conexio.tancaConexio();
+                        int horesRealitzades = contarHores(horaDataEntrada, dataHoraFormat.format(dataHora));
+
+                    } catch(SQLException ex){
+
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                } else {
                     missatge("A agut un error a la connexió a la Base de Dades.");
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else if (aFitxat == 1) {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
-                try{
-                    conexio.obrirConexio();
-                    ResultSet horaDataEntrada = conexio.ecjecutarConsulta("SELECT horaDataEntrada FROM dia WHERE dni LIKE \"" + dni + "\" AND data LIKE '" + dataFormat.format(dataHora) + "';");
-                    conexio.tancaConexio();
-                    int horesRealitzades = contarHores(horaDataEntrada, dataHoraFormat.format(dataHora));
-                    
-                } catch(SQLException ex){
-                    
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-            } else {
-                missatge("A agut un error a la connexió a la Base de Dades.");
             }
         } catch (IOException e){
             missatge("A agut un error en llegir les credencials guardades.");
@@ -391,31 +400,21 @@ public class principal extends javax.swing.JFrame {
         return 1;
     }
 
-    private boolean horariExist() {
-        File horai1 = new File("horari.xlsx");
-        File horai2 = new File("horari.ods");
-        if (horai1.exists()) {
-            System.out.println("Entre");
-            return true;
-        } else if (horai2.exists()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private void horari() {
-        if (!horariExist()) {
+        if (finestraSiNo("Vols canviar l'horari que hi ha guardat?")) {
+            
             JFileChooser fileChooser = new JFileChooser();
+            File arxiu = new File("horari.xlsx");
+            if (arxiu.exists()) {
+                arxiu.delete();
+            }
             int seleccion = 1;
-            File arxiu = new File("");
             do{
                 seleccion = fileChooser.showOpenDialog(principal.this);
                 if (seleccion == 0) {
                     arxiu = fileChooser.getSelectedFile();
                     //System.out.println(arxiu.getName());
                     String arxiuSplit[] = arxiu.getName().split("\\.");
-                    System.out.println(arxiuSplit.length);
                     if (arxiuSplit.length != 2) {
                         missatge("L'arxiu sol pot tenir 1 \".\", Ex.: nom.extensió");
                         seleccion = 1;
@@ -444,14 +443,59 @@ public class principal extends javax.swing.JFrame {
         String formatData = "yyyy-MM-dd  HH:mm:ss";
         SimpleDateFormat sdf = new SimpleDateFormat(formatData);
         try {
+            int hores = 0;
             horaDataEntrada.next();
             Date dataFiHora = sdf.parse(dataFi);
             Date dataIniciHora = sdf.parse(horaDataEntrada.getString(WIDTH));
+            Calendar calendari = Calendar.getInstance();
+            int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);// 1 Diumenge, 2 Dilluns, ..., 7 Dissabte
+            switch (diaSetmana){
+                case Calendar.MONDAY://Dilluns
+                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dilluns");
+                    break;
+            }
         } catch (ParseException e){
             
         } catch (SQLException ex) {
             
         }
         return 0;
+    }
+    
+    private boolean finestraSiNo(String missatge) {
+        int opcio = JOptionPane.showConfirmDialog(null, missatge, "Confirmación", JOptionPane.YES_NO_OPTION);
+        if (opcio == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private int obtenirHoresCalendari(Date dataIniciHora, Date dataFiHora, String dia) {
+        try {
+            FileInputStream fis = new FileInputStream(new File("horari.xlsx"));
+            //XSSFWorkbook workbook = new XSSFWorkbook(fis);
+        } catch (FileNotFoundException ex) {
+            missatge("Error a l'hora de llegir l'horari.");
+        }
+        return 0;
+    }
+    
+    private boolean capDeSetmana(String data){
+        String formatData = "yyyy-MM-dd  HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(formatData);
+        try {
+            Date dataFiHora = sdf.parse(data);
+            Calendar calendari = Calendar.getInstance();
+            int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);
+            if ((diaSetmana == 1) || (diaSetmana == 7)) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (ParseException ex) {
+            missatge("A agut un error en les dates i no es pot realitzar l'operació.");
+        }
+        return false;
     }
 }
