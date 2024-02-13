@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
@@ -31,6 +32,8 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -41,14 +44,6 @@ public class principal extends javax.swing.JFrame {
     
     public principal() {
         initComponents();
-        
-        /*
-        Comprovar si hi ha un arxiu al projecte amb el nom horari i amb l'extensió xlsx o ods.
-        En cas de no existir li demanarà a l'usuari que li digui on el té guardat (l'arxiu ha 
-        de ser horari.xlsx/ods) i copiar i enganxarà a l'arrel del projecte.
-        */
-        
-        horari();
         
         hores.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -474,9 +469,21 @@ public class principal extends javax.swing.JFrame {
     private int obtenirHoresCalendari(Date dataIniciHora, Date dataFiHora, String dia) {
         try {
             FileInputStream fis = new FileInputStream(new File("horari.xlsx"));
-            //XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            /*XSSFSheet sheet = workbook.getSheetAt(0);
+            ArrayList<ArrayList<String>> horari = new ArrayList<>();
+            int i = 0, y = 0;
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    y++;
+                }
+                i++;
+                y = 0;
+            }*/
         } catch (FileNotFoundException ex) {
             missatge("Error a l'hora de llegir l'horari.");
+        } catch (IOException ex) {
+            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
         }
         return 0;
     }

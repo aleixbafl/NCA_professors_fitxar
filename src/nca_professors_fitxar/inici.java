@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 
 public class inici extends javax.swing.JFrame {
     File usuariLogin = new File("usuari.txt");
@@ -36,7 +37,17 @@ public class inici extends javax.swing.JFrame {
                         if (resultat.next()){
                             guardarUsuari(resultat.getString(WIDTH));
                             conexio.tancaConexio();
+                            
+                            /*
+                            Comprovar si hi ha un arxiu al projecte amb el nom horari i amb l'extensió xlsx o ods.
+                            En cas de no existir li demanarà a l'usuari que li digui on el té guardat (l'arxiu ha 
+                            de ser horari.xlsx/ods) i copiar i enganxarà a l'arrel del projecte.
+                            */
+
+                            horari();
+                            
                             metodeSegonaPantalla();
+                            
                             dispose();
                         } else {
                             missatge("El DNI introduït és erroni o no existeix.");
@@ -277,5 +288,44 @@ public class inici extends javax.swing.JFrame {
         pantallaPrincipal.setIconImage(icon.getImage());
         pantallaPrincipal.setVisible(true);
         
+    }
+    
+    private void horari() {
+        if (finestraSiNo("Vols canviar l'horari que hi ha guardat?")) {
+            
+            JFileChooser fileChooser = new JFileChooser();
+            File arxiu = new File("horari.xlsx");
+            if (arxiu.exists()) {
+                arxiu.delete();
+            }
+            int seleccion = 1;
+            do{
+                seleccion = fileChooser.showOpenDialog(inici.this);
+                if (seleccion == 0) {
+                    arxiu = fileChooser.getSelectedFile();
+                    //System.out.println(arxiu.getName());
+                    String arxiuSplit[] = arxiu.getName().split("\\.");
+                    if (arxiuSplit.length != 2) {
+                        missatge("L'arxiu sol pot tenir 1 \".\", Ex.: nom.extensió");
+                        seleccion = 1;
+                    }else {
+                        if (!arxiuSplit[0].equals("horari")) {
+                            missatge("El nom de l'arxiu ha de ser \"horari\".");
+                        } else {
+                            switch (arxiuSplit[arxiuSplit.length - 1]){
+                                case "xlsx":
+                                    //seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
+                                    break;
+                                default:
+                                    missatge("L'arxiu ha de tenir l'extensió xlsx.");
+                                    seleccion = 1;
+                            }
+                        }
+                    }
+                } else {
+                    missatge("S'ha de seleccionar un arxiu.");
+                }
+            } while(seleccion != 0);
+        }
     }
 }
