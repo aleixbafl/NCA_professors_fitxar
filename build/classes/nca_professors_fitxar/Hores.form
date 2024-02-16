@@ -400,12 +400,12 @@
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel10" min="-2" pref="79" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="fitxarSetmana1" max="32767" attributes="0"/>
+                                          <Component id="fitxarMes" max="32767" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel9" min="-2" pref="79" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="horariSetmana1" max="32767" attributes="0"/>
+                                          <Component id="horariMes" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -425,7 +425,7 @@
                               <Component id="calenMes" min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="horariSetmana1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="horariMes" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -433,7 +433,7 @@
                               <Component id="calenAny" min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="fitxarSetmana1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="fitxarMes" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -472,13 +472,13 @@
                     <Property name="text" type="java.lang.String" value="Fixar Inici a Fi:"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="horariSetmana1">
+                <Component class="javax.swing.JLabel" name="horariMes">
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="0"/>
                     <Property name="text" type="java.lang.String" value="-"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="fitxarSetmana1">
+                <Component class="javax.swing.JLabel" name="fitxarMes">
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="0"/>
                     <Property name="text" type="java.lang.String" value="-"/>

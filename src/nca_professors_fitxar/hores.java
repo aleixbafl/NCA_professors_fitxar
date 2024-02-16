@@ -70,8 +70,8 @@ public class hores extends javax.swing.JFrame {
         calenAny = new com.toedter.calendar.JYearChooser();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        horariSetmana1 = new javax.swing.JLabel();
-        fitxarSetmana1 = new javax.swing.JLabel();
+        horariMes = new javax.swing.JLabel();
+        fitxarMes = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
         pantallaInici = new javax.swing.JButton();
 
@@ -243,11 +243,11 @@ public class hores extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel10.setText("Fixar Inici a Fi:");
 
-        horariSetmana1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        horariSetmana1.setText("-");
+        horariMes.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        horariMes.setText("-");
 
-        fitxarSetmana1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        fitxarSetmana1.setText("-");
+        fitxarMes.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        fitxarMes.setText("-");
 
         jButton3.setText("Visualitzar");
 
@@ -268,11 +268,11 @@ public class hores extends javax.swing.JFrame {
                             .addGroup(panellMesLayout.createSequentialGroup()
                                 .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(fitxarSetmana1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(fitxarMes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(panellMesLayout.createSequentialGroup()
                                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(horariSetmana1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(horariMes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -286,13 +286,13 @@ public class hores extends javax.swing.JFrame {
                     .addComponent(calenMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panellMesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel9)
-                        .addComponent(horariSetmana1)))
+                        .addComponent(horariMes)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panellMesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(calenAny, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panellMesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel10)
-                        .addComponent(fitxarSetmana1)))
+                        .addComponent(fitxarMes)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(8, Short.MAX_VALUE))
@@ -412,11 +412,11 @@ public class hores extends javax.swing.JFrame {
     private com.toedter.calendar.JMonthChooser calenMes;
     private com.toedter.calendar.JCalendar calenSetmana;
     private javax.swing.JLabel fitxarDia;
+    private javax.swing.JLabel fitxarMes;
     private javax.swing.JLabel fitxarSetmana;
-    private javax.swing.JLabel fitxarSetmana1;
     private javax.swing.JLabel horariDia;
+    private javax.swing.JLabel horariMes;
     private javax.swing.JLabel horariSetmana;
-    private javax.swing.JLabel horariSetmana1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
