@@ -32,6 +32,8 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -263,7 +265,8 @@ public class principal extends javax.swing.JFrame {
                         conexio.obrirConexio();
 
                         conexio.ecjecutarActualitzar("INSERT INTO `dia`(`data`, `dni`, `horaDataEntrada`) VALUES ('" + dataFormat.format(dataHora) + "','" + dni + "','" + dataHoraFormat.format(dataHora) + "');");
-
+                        
+                        missatge("S'ha fitxat l'inici de la jornada correctament.");
                         conexio.tancaConexio();
                     } catch (SQLException ex){
                         missatge("A agut un error a la connexió a la Base de Dades.");
@@ -274,8 +277,10 @@ public class principal extends javax.swing.JFrame {
                     try{
                         conexio.obrirConexio();
                         ResultSet horaDataEntrada = conexio.ecjecutarConsulta("SELECT horaDataEntrada FROM dia WHERE dni LIKE \"" + dni + "\" AND data LIKE '" + dataFormat.format(dataHora) + "';");
+                        horaDataEntrada.next();
+                        String dataEntrada = horaDataEntrada.getString(WIDTH);
                         conexio.tancaConexio();
-                        int horesRealitzades = contarHores(horaDataEntrada, dataHoraFormat.format(dataHora));
+                        int horesRealitzades = contarHores(dataEntrada, dataHoraFormat.format(dataHora));
 
                     } catch(SQLException ex){
 
@@ -283,8 +288,8 @@ public class principal extends javax.swing.JFrame {
                         Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
-                } else {
-                    missatge("A agut un error a la connexió a la Base de Dades.");
+                } else {// en cas d'aver fitxat l'entrada i la sortida sortira un missatge informan-ho
+                    missatge("En el dia d'avui (" + dataFormat.format(dataHora) + ") ja s'ha fitxat l'entrada i sortida.");
                 }
             }
         } catch (IOException e){
@@ -376,11 +381,6 @@ public class principal extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
         }
-        try {
-            conexio.tancaConexio();
-        } catch (SQLException ex) {
-            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
         return 0;
     }
 
@@ -434,25 +434,43 @@ public class principal extends javax.swing.JFrame {
         }
     }
 
-    private int contarHores(ResultSet horaDataEntrada, String dataFi) {
+    private int contarHores(String horaDataEntrada, String dataFi) {
         String formatData = "yyyy-MM-dd  HH:mm:ss";
         SimpleDateFormat sdf = new SimpleDateFormat(formatData);
+        System.out.println("\"" + horaDataEntrada + "\"" + "\n" + "\"" + dataFi + "\"");
         try {
-            int hores = 0;
-            horaDataEntrada.next();
+            Date dataIniciHora = sdf.parse(horaDataEntrada);
+            System.out.println("passe");
             Date dataFiHora = sdf.parse(dataFi);
-            Date dataIniciHora = sdf.parse(horaDataEntrada.getString(WIDTH));
             Calendar calendari = Calendar.getInstance();
+            int hores = 0;
             int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);// 1 Diumenge, 2 Dilluns, ..., 7 Dissabte
             switch (diaSetmana){
                 case Calendar.MONDAY://Dilluns
+                    System.out.println("Dilluns");
                     hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dilluns");
                     break;
+                case Calendar.TUESDAY://Dimarts
+                    System.out.println("Dimarts");
+                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dimarts");
+                    break;
+                case Calendar.WEDNESDAY://Dimecres
+                    System.out.println("Dimecres");
+                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dimecres");
+                    break;
+                case Calendar.THURSDAY://Dijous
+                    System.out.println("Dijous");
+                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dijous");
+                    break;
+                case Calendar.FRIDAY://Divendres
+                    System.out.println("Divendres");
+                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Divendres");
+                    break;
+                default:
+                    System.out.println("dissabte diumenge");
             }
         } catch (ParseException e){
-            
-        } catch (SQLException ex) {
-            
+            System.out.println("error passar string a date " + e);
         }
         return 0;
     }
@@ -467,19 +485,19 @@ public class principal extends javax.swing.JFrame {
     }
 
     private int obtenirHoresCalendari(Date dataIniciHora, Date dataFiHora, String dia) {
+        System.out.println("entre obtenirHoresCalendari");
         try {
             FileInputStream fis = new FileInputStream(new File("horari.xlsx"));
             XSSFWorkbook workbook = new XSSFWorkbook(fis);
-            /*XSSFSheet sheet = workbook.getSheetAt(0);
+            XSSFSheet sheet = workbook.getSheetAt(0);
             ArrayList<ArrayList<String>> horari = new ArrayList<>();
             int i = 0, y = 0;
             for (Row row : sheet) {
                 for (Cell cell : row) {
-                    y++;
+                    System.out.println(cell.toString() + "\t");
                 }
-                i++;
-                y = 0;
-            }*/
+                System.out.println("");
+            }
         } catch (FileNotFoundException ex) {
             missatge("Error a l'hora de llegir l'horari.");
         } catch (IOException ex) {
@@ -501,7 +519,7 @@ public class principal extends javax.swing.JFrame {
                 return true;
             }
         } catch (ParseException ex) {
-            missatge("A agut un error en les dates i no es pot realitzar l'operació.");
+            
         }
         return false;
     }
