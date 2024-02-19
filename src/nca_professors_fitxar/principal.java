@@ -20,20 +20,17 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -79,11 +76,8 @@ public class principal extends javax.swing.JFrame {
 
             private void eliminarHorari() {
                 File horai1 = new File("horari.xlsx");
-                File horai2 = new File("horari.ods");
-                if (horai1.exists()) {
+                if (horai1.exists() || horai1.isFile()) {
                     horai1.delete();
-                } else {
-                    horai2.delete();
                 }
             }
         });
@@ -255,7 +249,7 @@ public class principal extends javax.swing.JFrame {
             DateTimeFormatter dataFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             DateTimeFormatter dataHoraFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             
-            if (capDeSetmana(dataFormat.format(dataHora))) {
+            if (capDeSetmana()) {
                 missatge("No es fitxa als caps de setmana.");
             } else{
                 conexioBD conexio = new conexioBD();//Crear objecte conexioBD
@@ -283,9 +277,9 @@ public class principal extends javax.swing.JFrame {
                         int horesRealitzades = contarHores(dataEntrada, dataHoraFormat.format(dataHora));
 
                     } catch(SQLException ex){
-
+                        missatge("A agut un error en consultar les dades de la BD.");
                     } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+                        missatge("A agut un error a la connexió a la Base de Dades.");
                     }
 
                 } else {// en cas d'aver fitxat l'entrada i la sortida sortira un missatge informan-ho
@@ -395,84 +389,30 @@ public class principal extends javax.swing.JFrame {
         return 1;
     }
 
-    private void horari() {
-        if (finestraSiNo("Vols canviar l'horari que hi ha guardat?")) {
-            
-            JFileChooser fileChooser = new JFileChooser();
-            File arxiu = new File("horari.xlsx");
-            if (arxiu.exists()) {
-                arxiu.delete();
-            }
-            int seleccion = 1;
-            do{
-                seleccion = fileChooser.showOpenDialog(principal.this);
-                if (seleccion == 0) {
-                    arxiu = fileChooser.getSelectedFile();
-                    //System.out.println(arxiu.getName());
-                    String arxiuSplit[] = arxiu.getName().split("\\.");
-                    if (arxiuSplit.length != 2) {
-                        missatge("L'arxiu sol pot tenir 1 \".\", Ex.: nom.extensió");
-                        seleccion = 1;
-                    }else {
-                        if (!arxiuSplit[0].equals("horari")) {
-                            missatge("El nom de l'arxiu ha de ser \"horari\".");
-                        } else {
-                            switch (arxiuSplit[arxiuSplit.length - 1]){
-                                case "xlsx":
-                                    seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
-                                    break;
-                                default:
-                                    missatge("L'arxiu ha de tenir l'extensió xlsx.");
-                                    seleccion = 1;
-                            }
-                        }
-                    }
-                } else {
-                    missatge("S'ha de seleccionar un arxiu.");
-                }
-            } while(seleccion != 0);
-        }
-    }
-
     private int contarHores(String horaDataEntrada, String dataFi) {
         String formatData = "yyyy-MM-dd  HH:mm:ss";
         SimpleDateFormat sdf = new SimpleDateFormat(formatData);
-        System.out.println("\"" + horaDataEntrada + "\"" + "\n" + "\"" + dataFi + "\"");
-        try {
-            Date dataIniciHora = sdf.parse(horaDataEntrada);
-            System.out.println("passe");
-            Date dataFiHora = sdf.parse(dataFi);
-            Calendar calendari = Calendar.getInstance();
-            int hores = 0;
-            int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);// 1 Diumenge, 2 Dilluns, ..., 7 Dissabte
-            switch (diaSetmana){
-                case Calendar.MONDAY://Dilluns
-                    System.out.println("Dilluns");
-                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dilluns");
-                    break;
-                case Calendar.TUESDAY://Dimarts
-                    System.out.println("Dimarts");
-                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dimarts");
-                    break;
-                case Calendar.WEDNESDAY://Dimecres
-                    System.out.println("Dimecres");
-                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dimecres");
-                    break;
-                case Calendar.THURSDAY://Dijous
-                    System.out.println("Dijous");
-                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Dijous");
-                    break;
-                case Calendar.FRIDAY://Divendres
-                    System.out.println("Divendres");
-                    hores = obtenirHoresCalendari(dataIniciHora, dataFiHora, "Divendres");
-                    break;
-                default:
-                    System.out.println("dissabte diumenge");
+        Calendar calendari = Calendar.getInstance();
+        int hores = 0;
+        int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);// 1 Diumenge, 2 Dilluns, ..., 7 Dissabte
+        switch (diaSetmana){
+            case Calendar.MONDAY://Dilluns
+                hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dilluns");
+                break;
+            case Calendar.TUESDAY://Dimarts
+                hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dimarts");
+                break;
+            case Calendar.WEDNESDAY://Dimecres
+                hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dimecres");
+                break;
+            case Calendar.THURSDAY://Dijous
+                hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dijous");
+                break;
+            case Calendar.FRIDAY://Divendres
+                hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Divendres");
+                break;
             }
-        } catch (ParseException e){
-            System.out.println("error passar string a date " + e);
-        }
-        return 0;
+        return hores;
     }
     
     private boolean finestraSiNo(String missatge) {
@@ -484,43 +424,43 @@ public class principal extends javax.swing.JFrame {
         }
     }
 
-    private int obtenirHoresCalendari(Date dataIniciHora, Date dataFiHora, String dia) {
-        System.out.println("entre obtenirHoresCalendari");
+    private int obtenirHoresCalendari(String dataIniciHora, String dataFiHora, String dia) {
         try {
             FileInputStream fis = new FileInputStream(new File("horari.xlsx"));
             XSSFWorkbook workbook = new XSSFWorkbook(fis);
             XSSFSheet sheet = workbook.getSheetAt(0);
-            ArrayList<ArrayList<String>> horari = new ArrayList<>();
-            int i = 0, y = 0;
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    System.out.println(cell.toString() + "\t");
+            Iterator rowIterator = sheet.rowIterator();
+            String[][] horari = new String[14][6];
+            int i = 0;
+            while(rowIterator.hasNext()){
+                int y = 0;
+                XSSFRow FRow = (XSSFRow) rowIterator.next();
+                Iterator iterador = FRow.cellIterator();
+                while(iterador.hasNext()){
+                    XSSFCell FCell = (XSSFCell) iterador.next();
+                    horari[i][y] = FCell.getStringCellValue();
+                    System.out.print(horari[i][y] + " ");
+                    y++;
                 }
                 System.out.println("");
+                y = 0;
+                i++;
             }
         } catch (FileNotFoundException ex) {
-            missatge("Error a l'hora de llegir l'horari.");
+            missatge("Error de detecció de fitxer.");
         } catch (IOException ex) {
-            Logger.getLogger(principal.class.getName()).log(Level.SEVERE, null, ex);
+            missatge("Error de lectura d'excel: " + ex);
         }
         return 0;
     }
     
-    private boolean capDeSetmana(String data){
-        String formatData = "yyyy-MM-dd  HH:mm:ss";
-        SimpleDateFormat sdf = new SimpleDateFormat(formatData);
-        try {
-            Date dataFiHora = sdf.parse(data);
-            Calendar calendari = Calendar.getInstance();
-            int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);
-            if ((diaSetmana == 1) || (diaSetmana == 7)) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (ParseException ex) {
-            
+    private boolean capDeSetmana(){
+        Calendar calendari = Calendar.getInstance();
+        int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);
+        if ((diaSetmana == 1) || (diaSetmana == 7)) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 }

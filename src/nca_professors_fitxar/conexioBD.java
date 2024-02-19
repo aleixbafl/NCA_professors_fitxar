@@ -14,9 +14,9 @@ public class conexioBD {
     private Connection conexio;
 
     public conexioBD() {
-        this.url = "jdbc:mysql://localhost:3306/fitxar";
-        this.usuari = "root";
-        this.contrasenya = "";
+        this.url = "jdbc:mysql://srv965.hstgr.io:3306/u346867692_fitxar";
+        this.usuari = "u346867692_fitxar";
+        this.contrasenya = "Fat/323232";
         //this.drive = "com.mysql.cj.jdbc.Driver";
     }
     

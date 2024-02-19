@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -291,13 +295,18 @@ public class inici extends javax.swing.JFrame {
     }
     
     private void horari() {
-        if (finestraSiNo("Vols canviar l'horari que hi ha guardat?")) {
-            
-            JFileChooser fileChooser = new JFileChooser();
-            File arxiu = new File("horari.xlsx");
-            if (arxiu.exists()) {
-                arxiu.delete();
+        File arxiu = new File("horari.xlsx");
+        if (arxiu.exists()) {
+            if (finestraSiNo("Vols canviar l'horari que hi ha guardat?")) {
+                arxiuHorari(arxiu, true);
             }
+        } else {
+            arxiuHorari(arxiu, false);
+        }
+    }
+
+    private void arxiuHorari(File arxiu, boolean canviarHorari) {
+        JFileChooser fileChooser = new JFileChooser();
             int seleccion = 1;
             do{
                 seleccion = fileChooser.showOpenDialog(inici.this);
@@ -314,7 +323,7 @@ public class inici extends javax.swing.JFrame {
                         } else {
                             switch (arxiuSplit[arxiuSplit.length - 1]){
                                 case "xlsx":
-                                    //seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
+                                    seleccion = guardarArxiuProjecte(arxiu, arxiuSplit[arxiuSplit.length - 1]);
                                     break;
                                 default:
                                     missatge("L'arxiu ha de tenir l'extensió xlsx.");
@@ -323,9 +332,25 @@ public class inici extends javax.swing.JFrame {
                         }
                     }
                 } else {
-                    missatge("S'ha de seleccionar un arxiu.");
+                    if (canviarHorari) {
+                        if (!finestraSiNo("Realment vols canviar l'horari?")) {
+                            seleccion = 0;
+                        }
+                    } else {
+                        missatge("S'ha de seleccionar un arxiu.");
+                    }
                 }
             } while(seleccion != 0);
+    }
+
+    private int guardarArxiuProjecte(File arxiu, String extencio) {
+        Path rutaProjecte = Paths.get("horari." + extencio);
+        try {
+            Files.copy(arxiu.toPath(), rutaProjecte, StandardCopyOption.REPLACE_EXISTING);
+            return 0;
+        } catch (Exception e){
+            System.out.println("A agut un error en guardar l'arxiu.");
         }
+        return 1;
     }
 }
