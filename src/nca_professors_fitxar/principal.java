@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -275,7 +277,10 @@ public class principal extends javax.swing.JFrame {
                         String dataEntrada = horaDataEntrada.getString(WIDTH);
                         conexio.tancaConexio();
                         int horesRealitzades = contarHores(dataEntrada, dataHoraFormat.format(dataHora));
-
+                        conexio.obrirConexio();
+                        conexio.ecjecutarActualitzar("UPDATE dia SET `horaDataSortida`=" + dataFormat.format(dataHora) + ", `hores`=" + horesRealitzades + " WHERE `dni`=" + dni + ";");
+                        conexio.tancaConexio();
+                        missatge("S'ha fitxat correctament el fi de la jornada.");
                     } catch(SQLException ex){
                         missatge("A agut un error en consultar les dades de la BD.");
                     } catch (ClassNotFoundException ex) {
@@ -425,33 +430,52 @@ public class principal extends javax.swing.JFrame {
     }
 
     private int obtenirHoresCalendari(String dataIniciHora, String dataFiHora, String dia) {
-        try {
-            FileInputStream fis = new FileInputStream(new File("horari.xlsx"));
-            XSSFWorkbook workbook = new XSSFWorkbook(fis);
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator rowIterator = sheet.rowIterator();
-            String[][] horari = new String[14][6];
-            int i = 0;
-            while(rowIterator.hasNext()){
-                int y = 0;
-                XSSFRow FRow = (XSSFRow) rowIterator.next();
-                Iterator iterador = FRow.cellIterator();
-                while(iterador.hasNext()){
-                    XSSFCell FCell = (XSSFCell) iterador.next();
-                    horari[i][y] = FCell.getStringCellValue();
-                    System.out.print(horari[i][y] + " ");
-                    y++;
-                }
-                System.out.println("");
-                y = 0;
-                i++;
+        String[][] horari = new String[14][6];
+        lleguirHorari(horari);
+        boolean diaDiferent = true;
+        int columna = 0;
+        do {
+            columna++;
+            if (horari[0][columna].equals(dia)) {
+                diaDiferent = false;
             }
-        } catch (FileNotFoundException ex) {
-            missatge("Error de detecció de fitxer.");
-        } catch (IOException ex) {
-            missatge("Error de lectura d'excel: " + ex);
+        } while (diaDiferent);
+        boolean quartHoraInici = quartMargeInici(dataIniciHora.split(" "));
+        boolean quartHoraFi = quartMargeFi(dataFiHora.split(" "));
+        String posision = "";
+        for (int i = 1; i < horari[columna].length; i++) {
+            System.out.println(horari[columna][i]);
+            if (horari[columna][i].equals("x")) {
+                if (posision.equals("")) {
+                    posision = i + "";
+                } else {
+                    posision = posision + " " + i;
+                }
+            }
         }
-        return 0;
+        int horesRealitzades = 0;
+        String[] dataIniciSplit = dataIniciHora.split(" ");
+        String[] dataFiSplit = dataFiHora.split(" ");
+        String[] horaIniciString = dataIniciSplit[1].split(":");
+        String[] horaFiString = dataFiSplit[1].split(":");
+        int horaIni = Integer.parseInt(horaIniciString[1]);
+        int horaFi = Integer.parseInt(horaFiString[1]);
+        if (!quartHoraInici) {
+            horaIni++;
+        }
+        if (quartHoraFi) {
+            horaFi++;
+        }
+        if (!posision.equals("")) {
+            String[] posisionSplit = posision.split(" ");
+            for (int i = 0; i < posisionSplit.length; i++) {
+                int horaHorari = Integer.parseInt(horari[0][Integer.parseInt(posisionSplit[i])]);
+                if ((horaHorari >= horaIni) && (horaHorari <= horaFi)) {
+                    horesRealitzades++;
+                }
+            }
+        }
+        return horesRealitzades;
     }
     
     private boolean capDeSetmana(){
@@ -462,5 +486,42 @@ public class principal extends javax.swing.JFrame {
         } else {
             return false;
         }
+    }
+
+    private void lleguirHorari(String[][] horari) {
+        try {
+            FileInputStream fis = new FileInputStream(new File("horari.xlsx"));
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator rowIterator = sheet.rowIterator();
+            int files = 0;
+            while(rowIterator.hasNext() && files < 14){
+                Row row = (Row) rowIterator.next();
+                Iterator cellIterator = row.cellIterator();
+                int columnes = 0;
+                while(cellIterator.hasNext() && columnes < 6){
+                    Cell cell = (Cell) cellIterator.next();
+                    horari[files][columnes] = cell.toString();
+                    columnes++;
+                }
+                files++;
+            }
+        } catch (FileNotFoundException ex) {
+            missatge("Error de detecció de fitxer.");
+        } catch (IOException ex) {
+            missatge("Error de lectura d'excel: " + ex);
+        }
+    }
+
+    private boolean quartMargeInici(String[] dataIniciHora) {
+        String[] horaInici = dataIniciHora[1].split(":");
+        int minInici = Integer.parseInt(horaInici[1]);
+        return minInici < 21;
+    }
+
+    private boolean quartMargeFi(String[] dataFiHora) {
+        String[] horaFi = dataFiHora[1].split(":");
+        int minFI = Integer.parseInt(horaFi[1]);
+        return minFI > 44;
     }
 }
