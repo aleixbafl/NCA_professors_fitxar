@@ -277,9 +277,8 @@ public class principal extends javax.swing.JFrame {
                         String dataEntrada = horaDataEntrada.getString(WIDTH);
                         conexio.tancaConexio();
                         int horesRealitzades = contarHores(dataEntrada, dataHoraFormat.format(dataHora));
-                        System.out.println(horesRealitzades);
                         conexio.obrirConexio();
-                        conexio.ecjecutarActualitzar("UPDATE dia SET `horaDataSortida`='" + dataFormat.format(dataHora) + "', `hores`='" + horesRealitzades + "' WHERE `dni`='" + dni + "';");
+                        conexio.ecjecutarActualitzar("UPDATE dia SET `horaDataSortida`='" + dataHoraFormat.format(dataHora) + "', `hores`='" + horesRealitzades + "' WHERE `dni`='" + dni + "';");
                         conexio.tancaConexio();
                         missatge("S'ha fitxat correctament el fi de la jornada.");
                     } catch(SQLException ex){
@@ -444,9 +443,9 @@ public class principal extends javax.swing.JFrame {
         boolean quartHoraInici = quartMargeInici(dataIniciHora.split(" "));
         boolean quartHoraFi = quartMargeFi(dataFiHora.split(" "));
         String posision = "";
-        for (int i = 1; i < horari[columna].length; i++) {
-            if (horari[columna][i] != null) {
-                if (horari[columna][i].equals("x")) {
+        for (int i = 1; i < horari.length-1; i++) {
+            if (horari[i][columna] != null) {
+                if (horari[i][columna].equals("x")) {
                     if (posision.equals("")) {
                         posision = i + "";
                     } else {
@@ -460,8 +459,8 @@ public class principal extends javax.swing.JFrame {
         String[] dataFiSplit = dataFiHora.split(" ");
         String[] horaIniciString = dataIniciSplit[1].split(":");
         String[] horaFiString = dataFiSplit[1].split(":");
-        int horaIni = Integer.parseInt(horaIniciString[1]);
-        int horaFi = Integer.parseInt(horaFiString[1]);
+        int horaIni = Integer.parseInt(horaIniciString[0]);
+        int horaFi = Integer.parseInt(horaFiString[0]);
         if (!quartHoraInici) {
             horaIni++;
         }
@@ -471,7 +470,7 @@ public class principal extends javax.swing.JFrame {
         if (!posision.equals("")) {
             String[] posisionSplit = posision.split(" ");
             for (int i = 0; i < posisionSplit.length; i++) {
-                int horaHorari = Integer.parseInt(horari[0][Integer.parseInt(posisionSplit[i])]);
+                int horaHorari = (int) Double.parseDouble(horari[Integer.parseInt(posisionSplit[i])][0]);
                 if ((horaHorari >= horaIni) && (horaHorari <= horaFi)) {
                     horesRealitzades++;
                 }
