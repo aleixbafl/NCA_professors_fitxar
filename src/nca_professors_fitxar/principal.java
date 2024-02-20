@@ -277,8 +277,9 @@ public class principal extends javax.swing.JFrame {
                         String dataEntrada = horaDataEntrada.getString(WIDTH);
                         conexio.tancaConexio();
                         int horesRealitzades = contarHores(dataEntrada, dataHoraFormat.format(dataHora));
+                        System.out.println(horesRealitzades);
                         conexio.obrirConexio();
-                        conexio.ecjecutarActualitzar("UPDATE dia SET `horaDataSortida`=" + dataFormat.format(dataHora) + ", `hores`=" + horesRealitzades + " WHERE `dni`=" + dni + ";");
+                        conexio.ecjecutarActualitzar("UPDATE dia SET `horaDataSortida`='" + dataFormat.format(dataHora) + "', `hores`='" + horesRealitzades + "' WHERE `dni`='" + dni + "';");
                         conexio.tancaConexio();
                         missatge("S'ha fitxat correctament el fi de la jornada.");
                     } catch(SQLException ex){
@@ -444,12 +445,13 @@ public class principal extends javax.swing.JFrame {
         boolean quartHoraFi = quartMargeFi(dataFiHora.split(" "));
         String posision = "";
         for (int i = 1; i < horari[columna].length; i++) {
-            System.out.println(horari[columna][i]);
-            if (horari[columna][i].equals("x")) {
-                if (posision.equals("")) {
-                    posision = i + "";
-                } else {
-                    posision = posision + " " + i;
+            if (horari[columna][i] != null) {
+                if (horari[columna][i].equals("x")) {
+                    if (posision.equals("")) {
+                        posision = i + "";
+                    } else {
+                        posision = posision + " " + i;
+                    }
                 }
             }
         }
@@ -516,7 +518,7 @@ public class principal extends javax.swing.JFrame {
     private boolean quartMargeInici(String[] dataIniciHora) {
         String[] horaInici = dataIniciHora[1].split(":");
         int minInici = Integer.parseInt(horaInici[1]);
-        return minInici < 21;
+        return minInici < 16;
     }
 
     private boolean quartMargeFi(String[] dataFiHora) {
