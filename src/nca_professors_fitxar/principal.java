@@ -256,7 +256,7 @@ public class principal extends javax.swing.JFrame {
             } else{
                 conexioBD conexio = new conexioBD();//Crear objecte conexioBD
                 int aFitxat = fixarInici(conexio, dni, dataFormat.format(dataHora));//fixarInici retorne 0 (error SQL), 1 (el professor a fitxat el inici) i 2 (no a fitxat aquell dia)
-                if (aFitxat == 2) {//si el professor amb el X DNI amb X data, no a fixat a X data s'insertara la data, dni i dataHroaEntrada
+                if (aFitxat == 2) {//si el professor no a fitxat s'insertara la data, dni i dataHroaEntrada
                     try {
                         conexio.obrirConexio();
 
@@ -269,7 +269,7 @@ public class principal extends javax.swing.JFrame {
                     } catch (ClassNotFoundException ex) {
                         Logger.getLogger(inici.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } else if (aFitxat == 1) {// en cas d'aver fixat amb anterioritat el mateix dia sol savexira la dataHoraFi i les hores que a fet segons el seu horari
+                } else if (aFitxat == 1) {//si el profeso torne a donar al botor fitxar al mateixdia s'insertara horaDataFi i les hores
                     try{
                         conexio.obrirConexio();
                         ResultSet horaDataEntrada = conexio.ecjecutarConsulta("SELECT horaDataEntrada FROM dia WHERE dni LIKE \"" + dni + "\" AND data LIKE '" + dataFormat.format(dataHora) + "';");
@@ -367,11 +367,25 @@ public class principal extends javax.swing.JFrame {
     private int fixarInici(conexioBD conexio, String dniString, String data) {
         try{
             conexio.obrirConexio();
-            ResultSet resultat = conexio.ecjecutarConsulta("SELECT `data`, `dni` FROM `dia` WHERE data LIKE '" + data + "' AND dni LIKE '" + dniString + "'; ");
+            ResultSet resultat = conexio.ecjecutarConsulta("SELECT `data`, `dni` FROM `dia` WHERE data LIKE '" + data + "' AND dni LIKE '" + dniString + "';");
             if (resultat.next()) {
                 conexio.tancaConexio();
-                return 1;
+                conexio.obrirConexio();
+                ResultSet resultatHores = conexio.ecjecutarConsulta("SELECT `hores`, `dni` FROM `dia` WHERE data LIKE '" + data + "' AND dni LIKE '" + dniString + "';");
+                if (resultatHores.next()) {
+                    String hores = resultatHores.getString(WIDTH);
+                    conexio.tancaConexio();
+                    if (hores == null) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    conexio.tancaConexio();
+                    return 0;
+                }
             } else{
+                conexio.ecjecutarConsulta("");
                 conexio.tancaConexio();
                 return 2;
             }
@@ -402,18 +416,23 @@ public class principal extends javax.swing.JFrame {
         int diaSetmana = calendari.get(Calendar.DAY_OF_WEEK);// 1 Diumenge, 2 Dilluns, ..., 7 Dissabte
         switch (diaSetmana){
             case Calendar.MONDAY://Dilluns
+                //System.out.println("Dilluns");
                 hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dilluns");
                 break;
             case Calendar.TUESDAY://Dimarts
+                //System.out.println("Dimarts");
                 hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dimarts");
                 break;
             case Calendar.WEDNESDAY://Dimecres
+                //System.out.println("Dimecres");
                 hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dimecres");
                 break;
             case Calendar.THURSDAY://Dijous
+                //System.out.println("Dijous");
                 hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Dijous");
                 break;
             case Calendar.FRIDAY://Divendres
+                //System.out.println("Divendres");
                 hores = obtenirHoresCalendari(horaDataEntrada, dataFi, "Divendres");
                 break;
             }
@@ -435,10 +454,10 @@ public class principal extends javax.swing.JFrame {
         boolean diaDiferent = true;
         int columna = 0;
         do {
-            columna++;
             if (horari[0][columna].equals(dia)) {
                 diaDiferent = false;
             }
+            columna++;
         } while (diaDiferent);
         boolean quartHoraInici = quartMargeInici(dataIniciHora.split(" "));
         boolean quartHoraFi = quartMargeFi(dataFiHora.split(" "));

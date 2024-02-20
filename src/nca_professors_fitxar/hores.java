@@ -7,7 +7,19 @@ package nca_professors_fitxar;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -122,6 +134,11 @@ public class hores extends javax.swing.JFrame {
         fitxarDia.setText("-");
 
         jButton1.setText("Visualitzar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panellDiaLayout = new javax.swing.GroupLayout(panellDia);
         panellDia.setLayout(panellDiaLayout);
@@ -371,6 +388,30 @@ public class hores extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String dni = obtenirDNIfitxer();
+        Calendar dataEscollida = calenDia.getCalendar();
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String data = sdf.format(dataEscollida.getTime());
+        
+        conexioBD conexio = new conexioBD();
+        try {
+            conexio.obrirConexio();
+            ResultSet horaDataEntrada = conexio.ecjecutarConsulta("SELECT hores FROM `dia` WHERE `data` = '" + data + "' AND `dni` = '" + dni + "'; ");
+            if (horaDataEntrada.next()) {
+                horariDia.setText(horaDataEntrada.getInt(WIDTH) + "");
+            } else  {
+                horariDia.setText("-");
+                missatge("No hi han dades assegurant que s'ha fitxat o no s'ha fitxat el tancament.");
+            }
+        } catch (SQLException ex) {
+            missatge("Error de connexió a la BD.");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(hores.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -438,4 +479,26 @@ public class hores extends javax.swing.JFrame {
     private javax.swing.JPanel panellSetmana;
     private javax.swing.JButton pantallaInici;
     // End of variables declaration//GEN-END:variables
+
+    private String obtenirDNIfitxer() {
+        File f = new File("usuari.txt");
+        FileReader fr;
+        String dni = "";
+        try {
+            fr = new FileReader(f);
+            BufferedReader bf = new BufferedReader(fr);
+            dni = bf.readLine();
+            bf.close();
+            fr.close();
+        } catch (FileNotFoundException ex) {
+            missatge("Error detecció d'arxiu de l'usuari.");
+        } catch (IOException ex) {
+            missatge("Error de lectura d'usuari.");
+        }
+        return dni;
+    }
+
+    private void missatge(String missatge) {
+        JOptionPane.showMessageDialog(rootPane, missatge);
+    }
 }
