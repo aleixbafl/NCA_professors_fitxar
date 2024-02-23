@@ -385,7 +385,6 @@ public class principal extends javax.swing.JFrame {
                     return 0;
                 }
             } else{
-                conexio.ecjecutarConsulta("");
                 conexio.tancaConexio();
                 return 2;
             }
@@ -462,9 +461,10 @@ public class principal extends javax.swing.JFrame {
         boolean quartHoraInici = quartMargeInici(dataIniciHora.split(" "));
         boolean quartHoraFi = quartMargeFi(dataFiHora.split(" "));
         String posision = "";
+        System.out.println(columna);
         for (int i = 1; i < horari.length-1; i++) {
-            if (horari[i][columna] != null) {
-                if (horari[i][columna].equals("x")) {
+            if (horari[i][columna - 1] != null) {
+                if (horari[i][columna - 1].equals("x")) {
                     if (posision.equals("")) {
                         posision = i + "";
                     } else {
