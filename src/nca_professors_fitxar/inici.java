@@ -47,7 +47,7 @@ public class inici extends javax.swing.JFrame {
                             En cas de no existir li demanarà a l'usuari que li digui on el té guardat (l'arxiu ha 
                             de ser horari.xlsx/ods) i copiar i enganxarà a l'arrel del projecte.
                             */
-
+                            
                             horari();
                             
                             metodeSegonaPantalla();
@@ -320,6 +320,7 @@ public class inici extends javax.swing.JFrame {
                     }else {
                         if (!arxiuSplit[0].equals("horari")) {
                             missatge("El nom de l'arxiu ha de ser \"horari\".");
+                            seleccion = 1;
                         } else {
                             switch (arxiuSplit[arxiuSplit.length - 1]){
                                 case "xlsx":
@@ -349,7 +350,7 @@ public class inici extends javax.swing.JFrame {
             Files.copy(arxiu.toPath(), rutaProjecte, StandardCopyOption.REPLACE_EXISTING);
             return 0;
         } catch (Exception e){
-            System.out.println("A agut un error en guardar l'arxiu.");
+            missatge("A agut un error en guardar l'arxiu.");
         }
         return 1;
     }

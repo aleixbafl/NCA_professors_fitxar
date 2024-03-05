@@ -10,14 +10,12 @@ public class conexioBD {
     private String url;
     private String usuari;
     private String contrasenya;
-    private String drive;
     private Connection conexio;
 
     public conexioBD() {
         this.url = "jdbc:mysql://srv965.hstgr.io:3306/u346867692_fitxar";
         this.usuari = "u346867692_fitxar";
         this.contrasenya = "Fat/323232";
-        //this.drive = "com.mysql.cj.jdbc.Driver";
     }
     
     public void obrirConexio() throws SQLException, ClassNotFoundException{
